@@ -1,0 +1,18 @@
+package:
+  dependencies:
+    - console
+    - effect
+    - functions
+    - maybe
+    - nullable
+    - prelude
+    - react
+    - web-dom
+  name: react-dom
+workspace:
+  extraPackages:
+    react:
+      git: https://github.com/cwstra/purescript-react
+      ref: e8b2c009de7318d886212bf136d5df5bb97cf917
+  packageSet:
+    registry: 65.1.0
