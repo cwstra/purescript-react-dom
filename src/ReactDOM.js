@@ -1,15 +1,22 @@
-import ReactDOM from "react-dom";
+import ReactDOMClient from "react-dom/client";
 import ReactDOMServer from "react-dom/server";
 
-export function renderImpl(element, container) {
-  return ReactDOM.render(element, container);
+export function createRootImpl(element) {
+  return ReactDOMClient.createRoot(element);
 }
 
-export function hydrateImpl(element, container) {
-  return ReactDOM.hydrate(element, container);
+export function renderRootImpl(root, element) {
+  return root.render(element);
 }
 
-export const unmountComponentAtNodeImpl = ReactDOM.unmountComponentAtNode;
-export const findDOMNodeImpl = ReactDOM.findDOMNode;
+export function hydrateRootImpl(container, element) {
+  return ReactDOMClient.hydrateRoot(container, element);
+}
+
+export function unmountImpl(root) {
+  return root.unmount();
+}
+
+export const findDOMNodeImpl = ReactDOMClient.findDOMNode;
 export const renderToStringImpl = ReactDOMServer.renderToString;
 export const renderToStaticMarkupImpl = ReactDOMServer.renderToStaticMarkup;

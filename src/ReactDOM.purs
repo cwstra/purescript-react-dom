@@ -1,40 +1,48 @@
 module ReactDOM
-  ( render
-  , hydrate
-  , unmountComponentAtNode
-  , findDOMNode
-  , renderToString
+  ( findDOMNode
+  , createRoot
+  , hydrateRoot
+  , renderRoot
   , renderToStaticMarkup
-  ) where
+  , renderToStaticMarkupImpl
+  , renderToString
+  , unmount
+  , Root
+  )
+  where
 
 import Prelude
 
 import Data.Function.Uncurried (runFn1, Fn1)
-import Data.Maybe (Maybe)
-import Data.Nullable (Nullable, toMaybe)
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1, EffectFn2, runEffectFn1, runEffectFn2)
 import React (ReactElement, ReactComponent)
 import Web.DOM.Element (Element)
 
+data Root
+
+createRoot :: Element -> Root
+createRoot = runFn1 createRootImpl
+
+
 -- | Render a React element in a document element. Returns Nothing for stateless components.
-render
-  :: ReactElement
-  -> Element
-  -> Effect (Maybe ReactComponent)
-render rEl el = toMaybe <$> runEffectFn2 renderImpl rEl el
+renderRoot
+  :: Root
+  -> ReactElement
+  -> Effect Unit
+renderRoot root el = runEffectFn2 renderRootImpl root el
 
 -- | Same as `render`, but is used to hydrate a container whose HTML contents were rendered on the server.
-hydrate
-  :: ReactElement
-  -> Element
-  -> Effect (Maybe ReactComponent)
-hydrate rEl el = toMaybe <$> runEffectFn2 hydrateImpl rEl el
+hydrateRoot
+  :: Element
+  -> ReactElement
+  -> Effect Root
+hydrateRoot el rEl = runEffectFn2 hydrateRootImpl el rEl
 
 -- | Removes a mounted React element in a document element.
 -- | Returns true if it was unmounted, false otherwise.
-unmountComponentAtNode :: Element -> Effect Boolean
-unmountComponentAtNode = runEffectFn1 unmountComponentAtNodeImpl
+unmount :: Root -> Effect Unit
+unmount = runEffectFn1 unmountImpl
 
 -- | Finds the DOM node rendered by the component.
 findDOMNode :: ReactComponent -> Effect Element
@@ -48,27 +56,27 @@ renderToString = runFn1 renderToStringImpl
 renderToStaticMarkup :: ReactElement -> String
 renderToStaticMarkup = runFn1 renderToStaticMarkupImpl
 
-foreign import renderImpl
+foreign import createRootImpl :: Fn1 Element Root
+
+foreign import renderRootImpl
   :: EffectFn2
+       Root
        ReactElement
-       Element
-       (Nullable ReactComponent)
+       Unit
 
-foreign import hydrateImpl
+foreign import hydrateRootImpl
   :: EffectFn2
+       Element
        ReactElement
-       Element
-       (Nullable ReactComponent)
+       Root
 
-foreign import unmountComponentAtNodeImpl
+foreign import unmountImpl
   :: EffectFn1
-       Element
-       Boolean
+       Root
+       Unit
 
-foreign import findDOMNodeImpl
-  :: EffectFn1
-       ReactComponent
-       Element
+
+foreign import findDOMNodeImpl :: EffectFn1 ReactComponent Element
 
 foreign import renderToStringImpl :: Fn1 ReactElement String
 
